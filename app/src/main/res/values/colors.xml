@@ -1,0 +1,7 @@
+<resources>
+    <color name="gaz_blue">#00448C</color>
+    <color name="gaz_blue_light">#0072CE</color>
+    <color name="gaz_white">#FFFFFF</color>
+    <color name="gaz_gray_light">#F5F5F5</color>
+    <color name="gaz_silver">#C0C0C0</color>
+</resources>
