@@ -83,7 +83,7 @@ class ExcelExporter {
             row.createCell(3).setCellValue(op.people.toDouble())
             row.createCell(4).setCellValue(formatWorkersForExcel(op.workers))
             
-            val workersCount = op.workers.split(",").count { it.isNotBlank() }
+            val workersCount = op.workers.split(Regex(",(?![^(]*\\))")).count { it.isNotBlank() }
             row.createCell(5).setCellValue(workersCount.toDouble())
             
             row.createCell(6).setCellValue(op.tools)
@@ -104,7 +104,7 @@ class ExcelExporter {
             row.createCell(11).setCellValue(op.notes)
         }
 
-        // Автоширина для колонок
+        // --- Автоширина для колонок ---
         // Устанавливаем ширину колонок вручную во избежание ошибки AWT on Android
         val columnWidths = listOf(
             4000, 3000, 3000,
@@ -123,7 +123,7 @@ class ExcelExporter {
 
     private fun formatWorkersForExcel(workersStr: String): String {
         if (workersStr.isBlank()) return ""
-        val workerStrings = workersStr.split(",").map { it.trim() }.filter { it.isNotBlank() }
+        val workerStrings = workersStr.split(Regex(",(?![^(]*\\))")).map { it.trim() }.filter { it.isNotBlank() }
         if (workerStrings.isEmpty()) return ""
 
         val counts = mutableMapOf<String, Int>()
