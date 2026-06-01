@@ -88,13 +88,10 @@ class ExcelExporter {
             
             row.createCell(6).setCellValue(op.tools)
             
-            val equipmentItems = op.equipment.split(",").filter { it.isNotBlank() }.map { it.trim() }
+            val equipmentItems = op.equipment.split(Regex(",(?![^\\[]*\\])")).filter { it.isNotBlank() }.map { it.trim() }
             val equipmentCount = equipmentItems.size
-            val equipmentNames = equipmentItems.joinToString(", ") { it.substringBefore("=") }
-            val machinistsList = equipmentItems.mapNotNull { 
-                val parts = it.split("=")
-                if (parts.size > 1 && parts[1].isNotBlank()) "${parts[0]}: ${parts[1]}" else null
-            }.joinToString(", ")
+            val equipmentNames = equipmentItems.joinToString(", ") { it.substringBefore(" [") }
+            val machinistsList = formatMachinistsForExcel(op.equipment)
 
             row.createCell(7).setCellValue(equipmentNames)
             row.createCell(8).setCellValue(equipmentCount.toDouble())
@@ -179,6 +176,77 @@ class ExcelExporter {
                 posFormatted.isNotEmpty() -> posFormatted
                 gradeFormatted.isNotEmpty() -> gradeFormatted
                 else -> "Сотрудник"
+            }
+
+            counts[key] = (counts[key] ?: 0) + 1
+        }
+
+        return counts.entries.joinToString(", ") { "${it.key} - ${it.value} чел." }
+    }
+
+    private fun formatMachinistsForExcel(equipmentStr: String): String {
+        if (equipmentStr.isBlank()) return ""
+        val eqStrings = equipmentStr.split(Regex(",(?![^\\[]*\\])")).map { it.trim() }.filter { it.isNotBlank() }
+        if (eqStrings.isEmpty()) return ""
+
+        val counts = mutableMapOf<String, Int>()
+        val regexParens = Regex("\\[([^\\]]+)\\]")
+
+        for (e in eqStrings) {
+            var position = ""
+            var grade = ""
+
+            val matchResult = regexParens.find(e)
+            if (matchResult != null) {
+                val inner = matchResult.groupValues[1]
+                val details = inner.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                
+                val isFio = { str: String ->
+                    str.contains(Regex("[А-ЯA-Z]\\.[А-ЯA-Z]?\\.")) || (str.split(" ").size > 1 && str.any { it.isUpperCase() })
+                }
+
+                if (details.size >= 3) {
+                    position = details[1]
+                    grade = details[2]
+                } else if (details.size == 2) {
+                    val hasDigit0 = details[0].any { it.isDigit() }
+                    val hasDigit1 = details[1].any { it.isDigit() }
+                    if (hasDigit0) {
+                        grade = details[0]
+                        if (!isFio(details[1])) position = details[1]
+                    } else if (hasDigit1) {
+                        grade = details[1]
+                        if (!isFio(details[0])) position = details[0]
+                    } else {
+                        if (!isFio(details[0])) position = details[0]
+                        if (!isFio(details[1])) position = details[1]
+                    }
+                } else if (details.size == 1) {
+                    val valStr = details[0]
+                    if (valStr.any { it.isDigit() }) {
+                        grade = valStr
+                    } else if (!isFio(valStr)) {
+                        position = valStr
+                    }
+                }
+            }
+
+            var posFormatted = position.trim()
+            if (posFormatted.isNotEmpty()) {
+                posFormatted = posFormatted.substring(0, 1).uppercase(Locale.getDefault()) + posFormatted.substring(1)
+            }
+
+            var gradeFormatted = grade.trim()
+            if (gradeFormatted.isNotEmpty()) {
+                val gradeClean = gradeFormatted.replace(Regex("\\s*р\\.?$"), "")
+                gradeFormatted = gradeClean + "р."
+            }
+
+            val key = when {
+                posFormatted.isNotEmpty() && gradeFormatted.isNotEmpty() -> "$posFormatted $gradeFormatted"
+                posFormatted.isNotEmpty() -> posFormatted
+                gradeFormatted.isNotEmpty() -> gradeFormatted
+                else -> "Машинист"
             }
 
             counts[key] = (counts[key] ?: 0) + 1
