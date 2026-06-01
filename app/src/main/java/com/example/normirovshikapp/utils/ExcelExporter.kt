@@ -90,7 +90,7 @@ class ExcelExporter {
             
             val equipmentItems = op.equipment.split(Regex(",(?![^\\[]*\\])")).filter { it.isNotBlank() }.map { it.trim() }
             val equipmentCount = equipmentItems.size
-            val equipmentNames = equipmentItems.joinToString(", ") { it.substringBefore(" [") }
+            val equipmentNames = formatEquipmentForExcel(op.equipment)
             val machinistsList = formatMachinistsForExcel(op.equipment)
 
             row.createCell(7).setCellValue(equipmentNames)
@@ -184,6 +184,26 @@ class ExcelExporter {
         return counts.entries.joinToString(", ") { "${it.key} - ${it.value} чел." }
     }
 
+    private fun formatEquipmentForExcel(equipmentStr: String): String {
+        if (equipmentStr.isBlank()) return ""
+        val eqStrings = equipmentStr.split(Regex(",(?![^\\[]*\\])")).map { it.trim() }.filter { it.isNotBlank() }
+        if (eqStrings.isEmpty()) return ""
+
+        val counts = mutableMapOf<String, Int>()
+        for (e in eqStrings) {
+            val name = e.substringBefore(" [").substringBefore("=").trim()
+            var nameFormatted = name
+            if (nameFormatted.isNotEmpty()) {
+                nameFormatted = nameFormatted.substring(0, 1).uppercase(Locale.getDefault()) + nameFormatted.substring(1)
+            } else {
+                nameFormatted = "Техника"
+            }
+            counts[nameFormatted] = (counts[nameFormatted] ?: 0) + 1
+        }
+
+        return counts.entries.sortedBy { it.key }.joinToString(", ") { "${it.key} - ${it.value} шт." }
+    }
+
     private fun formatMachinistsForExcel(equipmentStr: String): String {
         if (equipmentStr.isBlank()) return ""
         val eqStrings = equipmentStr.split(Regex(",(?![^\\[]*\\])")).map { it.trim() }.filter { it.isNotBlank() }
@@ -245,7 +265,7 @@ class ExcelExporter {
             val key = when {
                 posFormatted.isNotEmpty() && gradeFormatted.isNotEmpty() -> "$posFormatted $gradeFormatted"
                 posFormatted.isNotEmpty() -> posFormatted
-                gradeFormatted.isNotEmpty() -> gradeFormatted
+                gradeFormatted.isNotEmpty() -> "Машинист $gradeFormatted"
                 else -> "Машинист"
             }
 
