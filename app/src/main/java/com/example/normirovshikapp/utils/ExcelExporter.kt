@@ -1,0 +1,189 @@
+package com.example.normirovshikapp.utils
+
+import com.example.normirovshikapp.data.DayEntity
+import com.example.normirovshikapp.data.OperationEntity
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.text.SimpleDateFormat
+import java.util.*
+
+class ExcelExporter {
+
+    init {
+        System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl")
+        System.setProperty("org.apache.poi.javax.xml.stream.XMLOutputFactory", "com.fasterxml.aalto.stax.OutputFactoryImpl")
+        System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl")
+    }
+
+    fun generateExcelWorkbook(day: DayEntity, operations: List<OperationEntity>): Workbook {
+        val workbook = XSSFWorkbook()
+
+        // --- Лист 1: Паспорт дня ---
+        val sheetPassport = workbook.createSheet("Паспорт")
+        val boldFont = workbook.createFont().apply { bold = true }
+        val boldStyle = workbook.createCellStyle().apply { setFont(boldFont) }
+
+        var rowIndex = 0
+        fun addRow(label: String, value: String) {
+            val row = sheetPassport.createRow(rowIndex++)
+            row.createCell(0).apply {
+                setCellValue(label)
+                cellStyle = boldStyle
+            }
+            row.createCell(1).setCellValue(value)
+        }
+
+        val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+
+        addRow("Название дня", day.name)
+        addRow("Дата создания", sdf.format(Date(day.createdAt)))
+        addRow("Место проведения", day.location)
+        addRow("Объект", day.objectName)
+        addRow("Организация", day.organization)
+        addRow("Вид работ", day.workType)
+        addRow("Техпроцесс", day.processName)
+        addRow("Документы", day.docsInfo)
+        addRow("Бригада №", day.brigadeNumber)
+        addRow("Бригадир", day.brigadeLeader)
+        
+        sheetPassport.createRow(rowIndex++) // пустая строка
+        
+        addRow("Исполнители (список)", day.workersList)
+        addRow("Инструменты (список)", day.toolsList)
+        addRow("Техника (список)", day.equipmentList)
+        addRow("Материалы (список)", day.materialsList)
+
+        sheetPassport.setColumnWidth(0, 6000) // ~20 символов
+        sheetPassport.setColumnWidth(1, 10000) // ~40 символов
+
+
+        // --- Лист 2: Хронометраж ---
+        val sheetOps = workbook.createSheet("Хронометраж")
+        val headerRow = sheetOps.createRow(0)
+        val headers = listOf("Название", "Начало", "Конец", "Люди", "Исполнители", "Кол-во рабочих", "Инструменты", "Техника", "Кол-во машин", "Машинисты", "Материалы", "Заметки")
+        
+        headers.forEachIndexed { index, title ->
+            headerRow.createCell(index).apply {
+                setCellValue(title)
+                cellStyle = boldStyle
+            }
+        }
+
+        val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+
+        operations.sortedBy { it.startEpoch }.forEachIndexed { index, op ->
+            val row = sheetOps.createRow(index + 1)
+            
+            row.createCell(0).setCellValue(op.name)
+            row.createCell(1).setCellValue(timeFormat.format(Date(op.startEpoch)))
+            
+            val stopText = if (op.stopEpoch != null) timeFormat.format(Date(op.stopEpoch)) else "Активна"
+            row.createCell(2).setCellValue(stopText)
+
+            row.createCell(3).setCellValue(op.people.toDouble())
+            row.createCell(4).setCellValue(formatWorkersForExcel(op.workers))
+            
+            val workersCount = op.workers.split(",").count { it.isNotBlank() }
+            row.createCell(5).setCellValue(workersCount.toDouble())
+            
+            row.createCell(6).setCellValue(op.tools)
+            
+            val equipmentItems = op.equipment.split(",").filter { it.isNotBlank() }.map { it.trim() }
+            val equipmentCount = equipmentItems.size
+            val equipmentNames = equipmentItems.joinToString(", ") { it.substringBefore("=") }
+            val machinistsList = equipmentItems.mapNotNull { 
+                val parts = it.split("=")
+                if (parts.size > 1 && parts[1].isNotBlank()) "${parts[0]}: ${parts[1]}" else null
+            }.joinToString(", ")
+
+            row.createCell(7).setCellValue(equipmentNames)
+            row.createCell(8).setCellValue(equipmentCount.toDouble())
+            row.createCell(9).setCellValue(machinistsList)
+            
+            row.createCell(10).setCellValue(op.materials)
+            row.createCell(11).setCellValue(op.notes)
+        }
+
+        // Автоширина для колонок
+        // Устанавливаем ширину колонок вручную во избежание ошибки AWT on Android
+        val columnWidths = listOf(
+            4000, 3000, 3000,
+            2000, 6000, 3000, 6000, 6000, 3000, 6000, 6000, 8000
+        )
+        for (i in headers.indices) {
+            if (i < columnWidths.size) {
+                sheetOps.setColumnWidth(i, columnWidths[i])
+            } else {
+                sheetOps.setColumnWidth(i, 4000)
+            }
+        }
+
+        return workbook
+    }
+
+    private fun formatWorkersForExcel(workersStr: String): String {
+        if (workersStr.isBlank()) return ""
+        val workerStrings = workersStr.split(",").map { it.trim() }.filter { it.isNotBlank() }
+        if (workerStrings.isEmpty()) return ""
+
+        val counts = mutableMapOf<String, Int>()
+        val regexParens = Regex("\\(([^)]+)\\)")
+
+        for (w in workerStrings) {
+            var position = ""
+            var grade = ""
+
+            val matchResult = regexParens.find(w)
+            if (matchResult != null) {
+                val inner = matchResult.groupValues[1]
+                val details = inner.split(",").map { it.trim() }
+                if (details.size >= 2) {
+                    position = details[0]
+                    grade = details[1]
+                } else if (details.isNotEmpty()) {
+                    val valStr = details[0]
+                    if (valStr.any { it.isDigit() }) {
+                        grade = valStr
+                    } else {
+                        position = valStr
+                    }
+                }
+            } else {
+                if (w.contains(",")) {
+                    val details = w.split(",").map { it.trim() }
+                    position = details[0]
+                    grade = details[1]
+                } else {
+                    val trimmed = w.trim()
+                    if (trimmed.any { it.isDigit() }) {
+                        grade = trimmed
+                    } else {
+                        position = trimmed
+                    }
+                }
+            }
+
+            var posFormatted = position.trim()
+            if (posFormatted.isNotEmpty()) {
+                posFormatted = posFormatted.substring(0, 1).uppercase(Locale.getDefault()) + posFormatted.substring(1)
+            }
+
+            var gradeFormatted = grade.trim()
+            if (gradeFormatted.isNotEmpty()) {
+                val gradeClean = gradeFormatted.replace(Regex("\\s*р\\.?$"), "")
+                gradeFormatted = gradeClean + "р."
+            }
+
+            val key = when {
+                posFormatted.isNotEmpty() && gradeFormatted.isNotEmpty() -> "$posFormatted $gradeFormatted"
+                posFormatted.isNotEmpty() -> posFormatted
+                gradeFormatted.isNotEmpty() -> gradeFormatted
+                else -> "Сотрудник"
+            }
+
+            counts[key] = (counts[key] ?: 0) + 1
+        }
+
+        return counts.entries.joinToString(", ") { "${it.key} - ${it.value} чел." }
+    }
+}
