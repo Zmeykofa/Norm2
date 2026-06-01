@@ -8,8 +8,15 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [DayEntity::class, OperationEntity::class],
-    version = 5,
+    entities = [
+        DayEntity::class,
+        OperationEntity::class,
+        StaffEntity::class,
+        ToolEntity::class,
+        EquipmentEntity::class,
+        MaterialEntity::class
+    ],
+    version = 7,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -58,6 +65,55 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // Миграция с версии 5 на 6 — создаём отдельные таблицы справочников
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS StaffEntity (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        position TEXT NOT NULL DEFAULT '',
+                        grade TEXT NOT NULL DEFAULT '',
+                        sortOrder INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS ToolEntity (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        sortOrder INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS EquipmentEntity (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        position TEXT NOT NULL DEFAULT '',
+                        grade TEXT NOT NULL DEFAULT '',
+                        machinist TEXT NOT NULL DEFAULT '',
+                        sortOrder INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS MaterialEntity (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        sortOrder INTEGER NOT NULL DEFAULT 0
+                    )"""
+                )
+            }
+        }
+
+        // Миграция с версии 6 на 7 — добавляем dayId в таблицы справочников для разделения по дням
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE StaffEntity ADD COLUMN dayId TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE ToolEntity ADD COLUMN dayId TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE EquipmentEntity ADD COLUMN dayId TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE MaterialEntity ADD COLUMN dayId TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -65,7 +121,14 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "normirovshik.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(
+                        MIGRATION_1_2,
+                        MIGRATION_2_3,
+                        MIGRATION_3_4,
+                        MIGRATION_4_5,
+                        MIGRATION_5_6,
+                        MIGRATION_6_7
+                    )
                     .build()
                 INSTANCE = instance
                 instance

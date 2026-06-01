@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
@@ -20,8 +19,8 @@ fun EditOperationDialog(
     onSave: (OperationEntity) -> Unit,
     viewModel: MainViewModel
 ) {
-    // Справочники из ViewModel
-    val workersList by viewModel.workersList.collectAsState()
+    // Справочники из ViewModel (теперь типизированные Entity)
+    val staffList by viewModel.staffList.collectAsState()
     val toolsList by viewModel.toolsList.collectAsState()
     val equipmentList by viewModel.equipmentList.collectAsState()
     val materialsList by viewModel.materialsList.collectAsState()
@@ -37,10 +36,45 @@ fun EditOperationDialog(
     var people by remember { mutableStateOf(operation.people.toString()) }
     var notes by remember { mutableStateOf(operation.notes) }
 
-    var selectedWorkers by remember { mutableStateOf(operation.workers.split(", ").filter { it.isNotBlank() }.toSet()) }
-    var selectedTools by remember { mutableStateOf(operation.tools.split(", ").filter { it.isNotBlank() }.toSet()) }
-    var selectedEquipment by remember { mutableStateOf(operation.equipment.split(", ").filter { it.isNotBlank() }.toSet()) }
-    var selectedMaterials by remember { mutableStateOf(operation.materials.split(", ").filter { it.isNotBlank() }.toSet()) }
+    // Выбранные исполнители по ID (восстанавливаем из строки workers)
+    var selectedWorkerIds by remember {
+        mutableStateOf(
+            run {
+                val names = operation.workers.split(Regex(",(?![^(]*\\))")).map { it.trim() }.filter { it.isNotBlank() }
+                staffList.filter { s -> names.any { it == s.displayName() || it == s.name } }.map { it.id }.toSet()
+            }
+        )
+    }
+
+    // Выбранные инструменты по ID
+    var selectedToolIds by remember {
+        mutableStateOf(
+            run {
+                val names = operation.tools.split(", ").map { it.trim() }.filter { it.isNotBlank() }
+                toolsList.filter { t -> names.contains(t.name) }.map { it.id }.toSet()
+            }
+        )
+    }
+
+    // Выбранная техника по ID
+    var selectedEquipmentIds by remember {
+        mutableStateOf(
+            run {
+                val names = operation.equipment.split(Regex(",(?![^\\[]*\\])")).map { it.trim() }.filter { it.isNotBlank() }
+                equipmentList.filter { e -> names.any { it == e.displayName() || it == e.name } }.map { it.id }.toSet()
+            }
+        )
+    }
+
+    // Выбранные материалы по ID
+    var selectedMaterialIds by remember {
+        mutableStateOf(
+            run {
+                val names = operation.materials.split(", ").map { it.trim() }.filter { it.isNotBlank() }
+                materialsList.filter { m -> names.contains(m.name) }.map { it.id }.toSet()
+            }
+        )
+    }
 
     // Флаги для открытия диалогов
     var showWorkersDialog by remember { mutableStateOf(false) }
@@ -49,6 +83,12 @@ fun EditOperationDialog(
     var showMaterialsDialog by remember { mutableStateOf(false) }
     var showTemplatesDialog by remember { mutableStateOf(false) }
     var isTemplatesDropdownExpanded by remember { mutableStateOf(false) }
+
+    // Отображаемые строки для кнопок
+    val selectedWorkersText = staffList.filter { selectedWorkerIds.contains(it.id) }.joinToString { it.displayName() }
+    val selectedToolsText = toolsList.filter { selectedToolIds.contains(it.id) }.joinToString { it.name }
+    val selectedEquipmentText = equipmentList.filter { selectedEquipmentIds.contains(it.id) }.joinToString { it.displayName() }
+    val selectedMaterialsText = materialsList.filter { selectedMaterialIds.contains(it.id) }.joinToString { it.name }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -68,7 +108,7 @@ fun EditOperationDialog(
                                 label = { Text("Название (или шаблон)") },
                                 modifier = Modifier.menuAnchor().fillMaxWidth(),
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isTemplatesDropdownExpanded) },
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                                colors = gazTextFieldColors()
                             )
                             if (templatesList.isNotEmpty()) {
                                 ExposedDropdownMenu(
@@ -78,10 +118,7 @@ fun EditOperationDialog(
                                     templatesList.forEach { template ->
                                         DropdownMenuItem(
                                             text = { Text(template) },
-                                            onClick = {
-                                                name = template
-                                                isTemplatesDropdownExpanded = false
-                                            }
+                                            onClick = { name = template; isTemplatesDropdownExpanded = false }
                                         )
                                     }
                                 }
@@ -91,45 +128,49 @@ fun EditOperationDialog(
                             Icon(Icons.Outlined.Edit, contentDescription = "Шаблоны операций")
                         }
                     }
+                    Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = people,
                         onValueChange = { people = it },
-                        label = { Text("Количество человек") }
+                        label = { Text("Количество человек") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
                     )
+                    Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = notes,
                         onValueChange = { notes = it },
-                        label = { Text("Заметки") }
+                        label = { Text("Заметки") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(Modifier.height(8.dp))
 
-// TextOverflow import needed
                     Button(onClick = { showWorkersDialog = true }, modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Исполнители: ${if (selectedWorkers.isEmpty()) "—" else selectedWorkers.joinToString()}",
+                            text = "Исполнители: ${if (selectedWorkersText.isBlank()) "—" else selectedWorkersText}",
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
                     Button(onClick = { showToolsDialog = true }, modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Инструменты: ${if (selectedTools.isEmpty()) "—" else selectedTools.joinToString()}",
+                            text = "Инструменты: ${if (selectedToolsText.isBlank()) "—" else selectedToolsText}",
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
                     Button(onClick = { showEquipmentDialog = true }, modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Техника: ${if (selectedEquipment.isEmpty()) "—" else selectedEquipment.joinToString { it.substringBefore("=") }}",
+                            text = "Техника: ${if (selectedEquipmentText.isBlank()) "—" else selectedEquipmentText}",
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                     }
-
                     Button(onClick = { showMaterialsDialog = true }, modifier = Modifier.fillMaxWidth()) {
                         Text(
-                            text = "Материалы: ${if (selectedMaterials.isEmpty()) "—" else selectedMaterials.joinToString()}",
+                            text = "Материалы: ${if (selectedMaterialsText.isBlank()) "—" else selectedMaterialsText}",
                             maxLines = 1,
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
@@ -139,32 +180,37 @@ fun EditOperationDialog(
         },
         confirmButton = {
             TextButton(onClick = {
+                val workersStr = staffList.filter { selectedWorkerIds.contains(it.id) }.joinToString(", ") { it.displayName() }
+                val toolsStr = toolsList.filter { selectedToolIds.contains(it.id) }.joinToString(", ") { it.name }
+                val equipmentStr = equipmentList.filter { selectedEquipmentIds.contains(it.id) }.joinToString(", ") { it.displayName() }
+                val materialsStr = materialsList.filter { selectedMaterialIds.contains(it.id) }.joinToString(", ") { it.name }
+
                 val updatedOp = operation.copy(
                     name = name,
                     people = people.toIntOrNull() ?: 0,
-                    workers = selectedWorkers.joinToString(", "),
-                    tools = selectedTools.joinToString(", "),
-                    equipment = selectedEquipment.joinToString(", "),
-                    materials = selectedMaterials.joinToString(", "),
+                    workers = workersStr,
+                    tools = toolsStr,
+                    equipment = equipmentStr,
+                    materials = materialsStr,
                     machinists = "",
                     notes = notes
                 )
-                
+
+                // Проверка конфликтов работников
                 val start1 = operation.startEpoch
                 val stop1 = operation.stopEpoch ?: Long.MAX_VALUE
-                
-                val overlaps = operations.filter { 
-                    it.id != operation.id && it.startEpoch < stop1 && start1 < (it.stopEpoch ?: Long.MAX_VALUE) 
+                val overlaps = operations.filter {
+                    it.id != operation.id && it.startEpoch < stop1 && start1 < (it.stopEpoch ?: Long.MAX_VALUE)
                 }
-                
+                val selectedNames = staffList.filter { selectedWorkerIds.contains(it.id) }.map { it.displayName() }
                 val conflicts = mutableListOf<String>()
-                for (w in selectedWorkers) {
-                    val busyIn = overlaps.filter { it.workers.split(",").map { s -> s.trim() }.contains(w.trim()) }
+                for (workerName in selectedNames) {
+                    val busyIn = overlaps.filter { it.workers.split(Regex(",(?![^(]*\\))")).map { s -> s.trim() }.contains(workerName) }
                     if (busyIn.isNotEmpty()) {
-                        conflicts.add("\n- $w (в: ${busyIn.joinToString { it.name }})")
+                        conflicts.add("\n- $workerName (в: ${busyIn.joinToString { it.name }})")
                     }
                 }
-                
+
                 if (conflicts.isNotEmpty()) {
                     conflictingMsg = "Следующие работники уже заняты в это время в других операциях:${conflicts.joinToString("")}\n\nВсё равно сохранить?"
                     pendingOp = updatedOp
@@ -177,82 +223,67 @@ fun EditOperationDialog(
         dismissButton = { TextButton(onClick = onDismiss) { Text("Отмена") } }
     )
 
-    // Диалоги выбора
+    // Диалог выбора исполнителей
     if (showWorkersDialog) {
-        MultiSelectDialog(
+        StaffMultiSelectDialog(
             title = "Исполнители",
-            options = workersList,
-            selected = selectedWorkers,
+            staff = staffList,
+            selected = selectedWorkerIds,
             onDismiss = { showWorkersDialog = false },
-            onConfirm = {
-                selectedWorkers = it
-                showWorkersDialog = false
-            },
-            onAddNew = { viewModel.addWorker(it) },
-            onUpdate = { old, new -> viewModel.updateWorker(old, new) },
-            onRemove = { viewModel.removeWorker(it) },
-            onMove = { item, dir -> viewModel.moveWorker(item, dir) }
-        )
-    }
-    if (showToolsDialog) {
-        MultiSelectDialog(
-            title = "Инструменты",
-            options = toolsList,
-            selected = selectedTools,
-            onDismiss = { showToolsDialog = false },
-            onConfirm = {
-                selectedTools = it
-                showToolsDialog = false
-            },
-            onAddNew = { viewModel.addTool(it) },
-            onUpdate = { old, new -> viewModel.updateTool(old, new) },
-            onRemove = { viewModel.removeTool(it) },
-            onMove = { item, dir -> viewModel.moveTool(item, dir) }
-        )
-    }
-    if (showEquipmentDialog) {
-        MultiSelectDialog(
-            title = "Техника",
-            options = equipmentList,
-            selected = selectedEquipment,
-            onDismiss = { showEquipmentDialog = false },
-            onConfirm = {
-                selectedEquipment = it
-                showEquipmentDialog = false
-            },
-            onAddNew = { viewModel.addEquipment(it) },
-            onUpdate = { old, new -> viewModel.updateEquipment(old, new) },
-            onRemove = { viewModel.removeEquipment(it) },
-            onMove = { item, dir -> viewModel.moveEquipment(item, dir) },
-            secondaryLabel = "Разряд / Имя машиниста",
-            parseItem = { 
-                val parts = it.split("=")
-                parts[0] to (parts.getOrNull(1) ?: "")
-            },
-            formatItem = { a, b -> if (b.isBlank()) a else "$a=$b" },
-            displayItem = { 
-                val parts = it.split("=")
-                if (parts.size > 1 && parts[1].isNotBlank()) "${parts[0]} (${parts[1]})" else parts[0]
-            }
-        )
-    }
-    if (showMaterialsDialog) {
-        MultiSelectDialog(
-            title = "Материалы",
-            options = materialsList,
-            selected = selectedMaterials,
-            onDismiss = { showMaterialsDialog = false },
-            onConfirm = {
-                selectedMaterials = it
-                showMaterialsDialog = false
-            },
-            onAddNew = { viewModel.addMaterial(it) },
-            onUpdate = { old, new -> viewModel.updateMaterial(old, new) },
-            onRemove = { viewModel.removeMaterial(it) },
-            onMove = { item, dir -> viewModel.moveMaterial(item, dir) }
+            onConfirm = { selectedWorkerIds = it; people = it.size.toString(); showWorkersDialog = false },
+            onAdd = { n, p, g -> viewModel.addStaff(n, p, g) },
+            onUpdate = { viewModel.updateStaff(it) },
+            onDelete = { viewModel.deleteStaff(it) },
+            onMove = { s, d -> viewModel.moveStaff(s, d) }
         )
     }
 
+    // Диалог выбора инструментов
+    if (showToolsDialog) {
+        ToolMultiSelectDialog(
+            title = "Инструменты",
+            tools = toolsList,
+            selected = selectedToolIds,
+            onDismiss = { showToolsDialog = false },
+            onConfirm = { selectedToolIds = it; showToolsDialog = false },
+            onAdd = { viewModel.addTool(it) },
+            onUpdate = { viewModel.updateTool(it) },
+            onDelete = { viewModel.deleteTool(it) },
+            onMove = { t, d -> viewModel.moveTool(t, d) }
+        )
+    }
+
+    // Диалог выбора техники
+    if (showEquipmentDialog) {
+        EquipmentMultiSelectDialog(
+            title = "Техника",
+            equipment = equipmentList,
+            selected = selectedEquipmentIds,
+            onDismiss = { showEquipmentDialog = false },
+            onConfirm = { selectedEquipmentIds = it; showEquipmentDialog = false },
+            onAdd = { n, p, g, m -> viewModel.addEquipment(n, p, g, m) },
+            onUpdate = { viewModel.updateEquipment(it) },
+            onDelete = { viewModel.deleteEquipment(it) },
+            onMove = { e, d -> viewModel.moveEquipment(e, d) }
+        )
+    }
+
+    // Диалог выбора материалов
+    if (showMaterialsDialog) {
+        MaterialMultiSelectDialog(
+            title = "Материалы",
+            materials = materialsList,
+            selected = selectedMaterialIds,
+            onDismiss = { showMaterialsDialog = false },
+            onConfirm = { selectedMaterialIds = it; showMaterialsDialog = false },
+            onAdd = { viewModel.addMaterial(it) },
+            onUpdate = { viewModel.updateMaterial(it) },
+            onDelete = { viewModel.deleteMaterial(it) },
+            onMove = { m, d -> viewModel.moveMaterial(m, d) }
+        )
+    }
+
+    // Диалог предупреждения о конфликте
     if (showWarningDialog && pendingOp != null) {
         AlertDialog(
             onDismissRequest = { showWarningDialog = false },
@@ -265,12 +296,11 @@ fun EditOperationDialog(
                     pendingOp = null
                 }) { Text("Всё равно сохранить") }
             },
-            dismissButton = {
-                TextButton(onClick = { showWarningDialog = false }) { Text("Отмена") }
-            }
+            dismissButton = { TextButton(onClick = { showWarningDialog = false }) { Text("Отмена") } }
         )
     }
 
+    // Диалог шаблонов операций
     if (showTemplatesDialog) {
         MultiSelectDialog(
             title = "Шаблоны операций",

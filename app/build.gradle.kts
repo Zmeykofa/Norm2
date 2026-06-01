@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" // версия = твоя версия Kotlin
-    id("com.google.devtools.ksp") version "2.0.21-1.0.25" // версия под твой Kotlin
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.10" // версия = твоя версия Kotlin
+    id("com.google.devtools.ksp") version "2.3.2" // версия под твой Kotlin
 }
 
 android {
@@ -62,9 +62,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Room + KSP
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-runtime:2.7.0")
+    implementation("androidx.room:room-ktx:2.7.0")
+    ksp("androidx.room:room-compiler:2.7.0")
 
     // Kotlin coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
@@ -82,4 +82,7 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:5.2.5")
     implementation("com.fasterxml:aalto-xml:1.3.2")
     implementation("javax.xml.stream:stax-api:1.0-2")
+    
+    // WebView support
+    implementation("androidx.webkit:webkit:1.11.0")
 }

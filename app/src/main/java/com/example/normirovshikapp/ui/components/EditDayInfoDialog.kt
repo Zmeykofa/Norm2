@@ -1,13 +1,11 @@
 package com.example.normirovshikapp.ui.components
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.ui.Modifier
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.normirovshikapp.data.DayEntity
 
 @Composable
@@ -25,16 +23,81 @@ fun EditDayInfoDialog(day: DayEntity, onDismiss: () -> Unit, onSave: (DayEntity)
         onDismissRequest = onDismiss,
         title = { Text("Редактировать общую информацию") },
         text = {
-            LazyColumn {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 item {
-                    OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Место проведения") })
-                    OutlinedTextField(value = objectName, onValueChange = { objectName = it }, label = { Text("Наименование объекта") })
-                    OutlinedTextField(value = organization, onValueChange = { organization = it }, label = { Text("Строительная организация") })
-                    OutlinedTextField(value = workType, onValueChange = { workType = it }, label = { Text("Вид работ") })
-                    OutlinedTextField(value = processName, onValueChange = { processName = it }, label = { Text("Наименование техпроцесса") })
-                    OutlinedTextField(value = docsInfo, onValueChange = { docsInfo = it }, label = { Text("Документы") })
-                    OutlinedTextField(value = brigadeNumber, onValueChange = { brigadeNumber = it }, label = { Text("Бригада №") })
-                    OutlinedTextField(value = brigadeLeader, onValueChange = { brigadeLeader = it }, label = { Text("Бригадир") })
+                    OutlinedTextField(
+                        value = location,
+                        onValueChange = { location = it },
+                        label = { Text("Место проведения") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = objectName,
+                        onValueChange = { objectName = it },
+                        label = { Text("Наименование объекта") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = organization,
+                        onValueChange = { organization = it },
+                        label = { Text("Строительная организация") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = workType,
+                        onValueChange = { workType = it },
+                        label = { Text("Вид работ") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = processName,
+                        onValueChange = { processName = it },
+                        label = { Text("Наименование техпроцесса") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = docsInfo,
+                        onValueChange = { docsInfo = it },
+                        label = { Text("Документы") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = brigadeNumber,
+                        onValueChange = { brigadeNumber = it },
+                        label = { Text("Бригада №") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    OutlinedTextField(
+                        value = brigadeLeader,
+                        onValueChange = { brigadeLeader = it },
+                        label = { Text("Бригадир") },
+                        colors = gazTextFieldColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         },

@@ -2,6 +2,10 @@ package com.example.normirovshikapp.utils
 
 import com.example.normirovshikapp.data.DayEntity
 import com.example.normirovshikapp.data.OperationEntity
+import com.example.normirovshikapp.data.StaffEntity
+import com.example.normirovshikapp.data.ToolEntity
+import com.example.normirovshikapp.data.EquipmentEntity
+import com.example.normirovshikapp.data.MaterialEntity
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.text.SimpleDateFormat
@@ -15,7 +19,14 @@ class ExcelExporter {
         System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl")
     }
 
-    fun generateExcelWorkbook(day: DayEntity, operations: List<OperationEntity>): Workbook {
+    fun generateExcelWorkbook(
+        day: DayEntity,
+        operations: List<OperationEntity>,
+        staffList: List<StaffEntity> = emptyList(),
+        toolsList: List<ToolEntity> = emptyList(),
+        equipmentList: List<EquipmentEntity> = emptyList(),
+        materialsList: List<MaterialEntity> = emptyList()
+    ): Workbook {
         val workbook = XSSFWorkbook()
 
         // --- Лист 1: Паспорт дня ---
@@ -48,13 +59,37 @@ class ExcelExporter {
         
         sheetPassport.createRow(rowIndex++) // пустая строка
         
-        addRow("Исполнители (список шаблонов)", formatWorkersForExcel(day.workersList))
-        addRow("Инструменты (список шаблонов)", day.toolsList)
-        addRow("Техника (список шаблонов)", formatEquipmentForExcel(day.equipmentList))
-        addRow("Материалы (список шаблонов)", day.materialsList)
+        val workersStr = if (day.workersList.isNotBlank()) {
+            day.workersList
+        } else {
+            staffList.joinToString(", ") { it.displayName() }
+        }
+        addRow("Исполнители (список шаблонов)", formatWorkersForExcel(workersStr))
+
+        val toolsStr = if (day.toolsList.isNotBlank()) {
+            day.toolsList
+        } else {
+            toolsList.joinToString(", ") { it.name }
+        }
+        addRow("Инструменты (список шаблонов)", toolsStr)
+
+        val equipmentStr = if (day.equipmentList.isNotBlank()) {
+            day.equipmentList
+        } else {
+            equipmentList.joinToString(", ") { it.displayName() }
+        }
+        addRow("Техника (список шаблонов)", formatEquipmentForExcel(equipmentStr))
+
+        val materialsStr = if (day.materialsList.isNotBlank()) {
+            day.materialsList
+        } else {
+            materialsList.joinToString(", ") { it.name }
+        }
+        addRow("Материалы (список шаблонов)", materialsStr)
 
         sheetPassport.setColumnWidth(0, 6000) // ~20 символов
         sheetPassport.setColumnWidth(1, 10000) // ~40 символов
+
 
 
         // --- Лист 2: Хронометраж ---

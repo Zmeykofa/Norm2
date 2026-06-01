@@ -11,50 +11,49 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 private val LightColorScheme = lightColorScheme(
-    primary = GazBlue,
+    primary = GazBlueDeep,
     onPrimary = GazWhite,
-    secondary = GazBlueLight,
+    secondary = GazBluePrimary,
     onSecondary = GazWhite,
-    background = GazWhite,
-    onBackground = Color(0xFF1C1C1C),
-    surface = GazGrayLight,
-    onSurface = GazBlue,
+    background = GazGrayBg,
+    onBackground = Color(0xFF0F172A),
+    surface = GazCardSurface,
+    onSurface = GazBlueDeep,
     outline = GazSilver,
 
-    secondaryContainer = GazBlue,
+    secondaryContainer = GazBluePrimary,
     onSecondaryContainer = GazWhite,
 
-    // ⚡ Добавляем, чтобы убрать остатки фиолетового
     tertiary = GazBlueLight,
     onTertiary = GazWhite,
-    tertiaryContainer = GazGrayLight,
-    onTertiaryContainer = GazBlue
+    tertiaryContainer = GazGrayBg,
+    onTertiaryContainer = GazBlueDeep
 )
 
 private val DarkColorScheme = darkColorScheme(
     primary = GazBlueLight,
     onPrimary = GazWhite,
     secondary = GazSilver,
-    onSecondary = GazBlue,
-    background = Color(0xFF121212),
+    onSecondary = GazBlueDeep,
+    background = Color(0xFF0B0F19),
     onBackground = GazWhite,
-    surface = Color(0xFF1E1E1E),
+    surface = Color(0xFF151D30),
     onSurface = GazWhite,
-    outline = GazGrayLight,
+    outline = Color(0xFF1E293B),
 
     secondaryContainer = GazBlueLight,
     onSecondaryContainer = GazWhite,
 
-    tertiary = GazBlue,
+    tertiary = GazBluePrimary,
     onTertiary = GazWhite,
-    tertiaryContainer = Color(0xFF2A2A2A),
+    tertiaryContainer = Color(0xFF1E293B),
     onTertiaryContainer = GazWhite
 )
 
 private val AppShapes = Shapes(
-    small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp)
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(28.dp)
 )
 
 @Composable
