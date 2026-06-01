@@ -17,5 +17,12 @@ data class DayEntity(
     val processName: String = "",
     val docsInfo: String = "",
     val brigadeNumber: String = "",
-    val brigadeLeader: String = ""
+    val brigadeLeader: String = "",
+
+    // Списки ресурсов (разделенные запятой или любым разделителем)
+    val workersList: String = "",
+    val toolsList: String = "",
+    val equipmentList: String = "",
+    val materialsList: String = "",
+    val operationTemplatesList: String = ""
 )

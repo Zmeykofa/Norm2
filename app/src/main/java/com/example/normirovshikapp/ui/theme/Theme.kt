@@ -6,6 +6,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.Shapes
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 private val LightColorScheme = lightColorScheme(
     primary = GazBlue,
@@ -48,6 +51,12 @@ private val DarkColorScheme = darkColorScheme(
     onTertiaryContainer = GazWhite
 )
 
+private val AppShapes = Shapes(
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(16.dp)
+)
+
 @Composable
 fun NormirovshikAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -58,6 +67,7 @@ fun NormirovshikAppTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = AppShapes,
         content = content
     )
 }

@@ -15,5 +15,6 @@ data class OperationEntity(
     val tools: String,
     val equipment: String,
     val workers: String,
+    val machinists: String,
     val notes: String
 )

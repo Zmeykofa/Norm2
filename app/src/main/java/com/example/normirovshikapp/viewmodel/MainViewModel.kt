@@ -8,6 +8,7 @@ import com.example.normirovshikapp.data.AppDao
 import com.example.normirovshikapp.data.DayEntity
 import com.example.normirovshikapp.data.OperationEntity
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,9 @@ class MainViewModel(
     private val _isFirstDayCreated = MutableStateFlow(false)
     val isFirstDayCreated: StateFlow<Boolean> = _isFirstDayCreated.asStateFlow()
 
+    private val _currentTime = MutableStateFlow(System.currentTimeMillis())
+    val currentTime: StateFlow<Long> = _currentTime.asStateFlow()
+
     private var operationsJob: Job? = null
 
     // --- Справочники для выбора исполнителей, инструментов, техники и материалов ---
@@ -50,64 +54,182 @@ class MainViewModel(
     private val _materialsList = MutableStateFlow<List<String>>(emptyList())
     val materialsList: StateFlow<List<String>> = _materialsList.asStateFlow()
 
+    private val _operationTemplatesList = MutableStateFlow<List<String>>(emptyList())
+    val operationTemplatesList: StateFlow<List<String>> = _operationTemplatesList.asStateFlow()
+
     // Методы добавления новых значений в справочники
+    private fun saveResourcesToCurrentDay() {
+        val day = _currentDay.value ?: return
+        val updated = day.copy(
+            workersList = _workersList.value.joinToString(","),
+            toolsList = _toolsList.value.joinToString(","),
+            equipmentList = _equipmentList.value.joinToString(","),
+            materialsList = _materialsList.value.joinToString(","),
+            operationTemplatesList = _operationTemplatesList.value.joinToString(",")
+        )
+        updateDay(updated)
+    }
+
+    private fun loadResourcesFromDay(day: DayEntity) {
+        _workersList.value = day.workersList.split(",").filter { it.isNotBlank() }
+        _toolsList.value = day.toolsList.split(",").filter { it.isNotBlank() }
+        _equipmentList.value = day.equipmentList.split(",").filter { it.isNotBlank() }
+        _materialsList.value = day.materialsList.split(",").filter { it.isNotBlank() }
+        _operationTemplatesList.value = day.operationTemplatesList.split(",").filter { it.isNotBlank() }
+    }
+
     fun addWorker(newWorker: String) {
         if (newWorker.isNotBlank() && !_workersList.value.contains(newWorker)) {
-            _workersList.value = _workersList.value + newWorker
+            _workersList.value = listOf(newWorker) + _workersList.value
+            saveResourcesToCurrentDay()
         }
     }
 
     fun addTool(newTool: String) {
         if (newTool.isNotBlank() && !_toolsList.value.contains(newTool)) {
-            _toolsList.value = _toolsList.value + newTool
+            _toolsList.value = listOf(newTool) + _toolsList.value
+            saveResourcesToCurrentDay()
         }
     }
 
     fun addEquipment(newEq: String) {
         if (newEq.isNotBlank() && !_equipmentList.value.contains(newEq)) {
-            _equipmentList.value = _equipmentList.value + newEq
+            _equipmentList.value = listOf(newEq) + _equipmentList.value
+            saveResourcesToCurrentDay()
         }
     }
 
     // --- Обновление и удаление исполнителей ---
     fun updateWorker(old: String, new: String) {
         _workersList.value = _workersList.value.map { if (it == old) new else it }
+        saveResourcesToCurrentDay()
     }
 
     fun removeWorker(item: String) {
         _workersList.value = _workersList.value - item
+        saveResourcesToCurrentDay()
+    }
+
+    fun moveWorker(item: String, direction: Int) {
+        val list = _workersList.value.toMutableList()
+        val index = list.indexOf(item)
+        if (index == -1) return
+        val newIndex = index + direction
+        if (newIndex in 0 until list.size) {
+            list.removeAt(index)
+            list.add(newIndex, item)
+            _workersList.value = list
+            saveResourcesToCurrentDay()
+        }
     }
 
     // --- Инструменты ---
     fun updateTool(old: String, new: String) {
         _toolsList.value = _toolsList.value.map { if (it == old) new else it }
+        saveResourcesToCurrentDay()
     }
 
     fun removeTool(item: String) {
         _toolsList.value = _toolsList.value - item
+        saveResourcesToCurrentDay()
+    }
+
+    fun moveTool(item: String, direction: Int) {
+        val list = _toolsList.value.toMutableList()
+        val index = list.indexOf(item)
+        if (index == -1) return
+        val newIndex = index + direction
+        if (newIndex in 0 until list.size) {
+            list.removeAt(index)
+            list.add(newIndex, item)
+            _toolsList.value = list
+            saveResourcesToCurrentDay()
+        }
     }
 
     // --- Техника ---
     fun updateEquipment(old: String, new: String) {
         _equipmentList.value = _equipmentList.value.map { if (it == old) new else it }
+        saveResourcesToCurrentDay()
     }
 
     fun removeEquipment(item: String) {
         _equipmentList.value = _equipmentList.value - item
+        saveResourcesToCurrentDay()
+    }
+
+    fun moveEquipment(item: String, direction: Int) {
+        val list = _equipmentList.value.toMutableList()
+        val index = list.indexOf(item)
+        if (index == -1) return
+        val newIndex = index + direction
+        if (newIndex in 0 until list.size) {
+            list.removeAt(index)
+            list.add(newIndex, item)
+            _equipmentList.value = list
+            saveResourcesToCurrentDay()
+        }
     }
 
     // --- Материалы ---
     fun updateMaterial(old: String, new: String) {
         _materialsList.value = _materialsList.value.map { if (it == old) new else it }
+        saveResourcesToCurrentDay()
     }
 
     fun removeMaterial(item: String) {
         _materialsList.value = _materialsList.value - item
+        saveResourcesToCurrentDay()
+    }
+
+    fun moveMaterial(item: String, direction: Int) {
+        val list = _materialsList.value.toMutableList()
+        val index = list.indexOf(item)
+        if (index == -1) return
+        val newIndex = index + direction
+        if (newIndex in 0 until list.size) {
+            list.removeAt(index)
+            list.add(newIndex, item)
+            _materialsList.value = list
+            saveResourcesToCurrentDay()
+        }
     }
 
     fun addMaterial(newMat: String) {
         if (newMat.isNotBlank() && !_materialsList.value.contains(newMat)) {
-            _materialsList.value = _materialsList.value + newMat
+            _materialsList.value = listOf(newMat) + _materialsList.value
+            saveResourcesToCurrentDay()
+        }
+    }
+
+    // --- Шаблоны операций ---
+    fun updateOperationTemplate(old: String, new: String) {
+        _operationTemplatesList.value = _operationTemplatesList.value.map { if (it == old) new else it }
+        saveResourcesToCurrentDay()
+    }
+
+    fun removeOperationTemplate(item: String) {
+        _operationTemplatesList.value = _operationTemplatesList.value - item
+        saveResourcesToCurrentDay()
+    }
+
+    fun moveOperationTemplate(item: String, direction: Int) {
+        val list = _operationTemplatesList.value.toMutableList()
+        val index = list.indexOf(item)
+        if (index == -1) return
+        val newIndex = index + direction
+        if (newIndex in 0 until list.size) {
+            list.removeAt(index)
+            list.add(newIndex, item)
+            _operationTemplatesList.value = list
+            saveResourcesToCurrentDay()
+        }
+    }
+
+    fun addOperationTemplate(newTemp: String) {
+        if (newTemp.isNotBlank() && !_operationTemplatesList.value.contains(newTemp)) {
+            _operationTemplatesList.value = listOf(newTemp) + _operationTemplatesList.value
+            saveResourcesToCurrentDay()
         }
     }
 
@@ -117,6 +239,14 @@ class MainViewModel(
                 _days.value = list
             }
         }
+        
+        viewModelScope.launch {
+            while (true) {
+                _currentTime.value = System.currentTimeMillis()
+                delay(1000)
+            }
+        }
+        
         restoreLastDay()
     }
 
@@ -148,6 +278,9 @@ class MainViewModel(
         _currentDay.value = day
         saveLastDayIdToPrefs(day.id)
 
+        // Загружаем списки
+        loadResourcesFromDay(day)
+
         operationsJob?.cancel()
         operationsJob = viewModelScope.launch {
             dao.getOperationsForDayFlow(day.id).collect { list ->
@@ -156,20 +289,23 @@ class MainViewModel(
         }
     }
 
-    fun addDay(name: String) {
+    fun addDay(name: String, sourceDayId: String? = null) {
         viewModelScope.launch {
+            // Если есть sourceDayId, пытаемся найти его, чтобы скопировать списки
+            val sourceDay = if (sourceDayId != null) dao.getDayById(sourceDayId) else null
+
             val newDay = DayEntity(
                 id = UUID.randomUUID().toString(),
                 name = name,
-                createdAt = System.currentTimeMillis()
+                createdAt = System.currentTimeMillis(),
+                // Копируем списки, если день найден
+                workersList = sourceDay?.workersList ?: "",
+                toolsList = sourceDay?.toolsList ?: "",
+                equipmentList = sourceDay?.equipmentList ?: "",
+                materialsList = sourceDay?.materialsList ?: "",
+                operationTemplatesList = sourceDay?.operationTemplatesList ?: ""
             )
             dao.insertDay(newDay)
-
-            // сбрасываем справочники
-            _workersList.value = emptyList()
-            _toolsList.value = emptyList()
-            _equipmentList.value = emptyList()
-            _materialsList.value = emptyList()
 
             selectDay(newDay)
         }
@@ -206,6 +342,7 @@ class MainViewModel(
                 tools = "",
                 equipment = "",
                 workers = "",
+                machinists = "",
                 notes = ""
             )
             dao.insertOperation(op)
@@ -264,6 +401,18 @@ class MainViewModel(
             val stopped = op.copy(stopEpoch = now)
             dao.updateOperation(stopped)
 
+            val newOp = op.copy(
+                id = UUID.randomUUID().toString(),
+                startEpoch = now,
+                stopEpoch = null
+            )
+            dao.insertOperation(newOp)
+        }
+    }
+
+    fun repeatOperation(op: OperationEntity) {
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
             val newOp = op.copy(
                 id = UUID.randomUUID().toString(),
                 startEpoch = now,

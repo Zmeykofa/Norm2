@@ -9,8 +9,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [DayEntity::class, OperationEntity::class],
-    version = 2, // увеличили версию
-    exportSchema = false // отключили экспорт схемы, чтобы не было ошибки
+    version = 5,
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -34,6 +34,30 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // Миграция с версии 2 на 3 — добавляем списки ресурсов
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE DayEntity ADD COLUMN workersList TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE DayEntity ADD COLUMN toolsList TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE DayEntity ADD COLUMN equipmentList TEXT NOT NULL DEFAULT ''")
+                database.execSQL("ALTER TABLE DayEntity ADD COLUMN materialsList TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        // Миграция с версии 3 на 4 — добавляем шаблоны операций
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE DayEntity ADD COLUMN operationTemplatesList TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        // Миграция с версии 4 на 5 — добавляем поле machinists в OperationEntity
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE OperationEntity ADD COLUMN machinists TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -41,7 +65,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "normirovshik.db"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build()
                 INSTANCE = instance
                 instance

@@ -48,9 +48,9 @@ class ExcelExporter {
         
         sheetPassport.createRow(rowIndex++) // пустая строка
         
-        addRow("Исполнители (список шаблонов)", day.workersList)
+        addRow("Исполнители (список шаблонов)", formatWorkersForExcel(day.workersList))
         addRow("Инструменты (список шаблонов)", day.toolsList)
-        addRow("Техника (список шаблонов)", day.equipmentList)
+        addRow("Техника (список шаблонов)", formatEquipmentForExcel(day.equipmentList))
         addRow("Материалы (список шаблонов)", day.materialsList)
 
         sheetPassport.setColumnWidth(0, 6000) // ~20 символов

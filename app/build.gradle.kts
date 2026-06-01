@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Room + KSP
     implementation("androidx.room:room-runtime:2.6.1")
@@ -69,9 +70,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // PDF и ресурсы
-    implementation("androidx.core:core-ktx:1.13.1")
-
     // Тесты
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -81,4 +79,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+    implementation("com.fasterxml:aalto-xml:1.3.2")
+    implementation("javax.xml.stream:stax-api:1.0-2")
 }
