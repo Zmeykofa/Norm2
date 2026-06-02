@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Нормировщик — Система оперативного учета и хронометража</title>
+  
+  <!-- Подключение премиум шрифтов -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Подключение иконок Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  
+  <!-- Ссылки на стили -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ФОНОВЫЕ ДЕКОРАТИВНЫЕ СВЕЧЕНИЯ (Glow blobs) -->
+  <div class="glow-blob glow-blob-1"></div>
+  <div class="glow-blob glow-blob-2"></div>
+  <div class="glow-blob glow-blob-3"></div>
+
+  <!-- ШАПКА САЙТА (Header / Navbar) -->
+  <header class="navbar">
+    <div class="navbar-container">
+      <div class="logo">
+        <span class="material-icons-outlined logo-icon">date_range</span>
+        <span class="logo-text">Нормировщик</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#about" class="nav-link">О приложении</a>
+        <a href="#features" class="nav-link">Возможности</a>
+        <a href="#demo" class="nav-link">Живой демо-таймер</a>
+        <a href="#platforms" class="nav-link">Платформы</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="../web/index.html" target="_blank" class="btn btn-secondary btn-sm">
+          <span class="material-icons-outlined btn-icon">open_in_new</span> PWA Версия
+        </a>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span class="material-icons-outlined">menu</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ГЛАВНЫЙ ЭКРАН (Hero Section) -->
+  <section class="hero" id="about">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="badge">ВЕРСИЯ 7.1 • ГАЗПРОМ СТРОЙ СТИЛЬ</div>
+        <h1>Умный учет рабочего времени прямо на объекте</h1>
+        <p class="hero-desc">
+          Профессиональный инструмент для инженеров-нормировщиков. Фиксируйте операции в реальном времени, ведите локальные справочники рабочих, техники и материалов, и выгружайте готовые Excel-отчеты в один клик. Полная автономность и работа без интернета.
+        </p>
+        <div class="hero-cta">
+          <button class="btn btn-primary" id="scrollDownloadBtn">
+            <span class="material-icons-outlined">android</span> Скачать на Android
+          </button>
+          <a href="../web/index.html" target="_blank" class="btn btn-outline">
+            <span class="material-icons-outlined">web</span> Открыть PWA в браузере
+          </a>
+        </div>
+        <div class="hero-features">
+          <div class="hero-feat-item">
+            <span class="material-icons-outlined">bolt</span>
+            <span>0мс задержки</span>
+          </div>
+          <div class="hero-feat-item">
+            <span class="material-icons-outlined">cloud_off</span>
+            <span>100% офлайн</span>
+          </div>
+          <div class="hero-feat-item">
+            <span class="material-icons-outlined">security</span>
+            <span>Данные только на устройстве</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Интерактивный floating макет смартфона -->
+      <div class="hero-visual">
+        <div class="phone-frame animate-float">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <span class="phone-title">Нормировщик</span>
+              <span class="material-icons-outlined phone-icon-top">save_alt</span>
+            </div>
+            
+            <div class="phone-body">
+              <!-- Карточка паспорта -->
+              <div class="sim-card passport-card">
+                <div class="sim-card-header">
+                  <span class="material-icons-outlined text-primary">assignment</span>
+                  <span>Паспорт дня</span>
+                </div>
+                <div class="sim-grid">
+                  <div class="sim-field"><span class="label">Объект</span><span class="value">ГКМ Уренгой</span></div>
+                  <div class="sim-field"><span class="label">Бригада</span><span class="value">№4 - Иванов</span></div>
+                </div>
+              </div>
+              
+              <!-- Активная операция -->
+              <div class="sim-card operation-card active">
+                <div class="op-status-bar"></div>
+                <div class="op-main-row">
+                  <div class="op-details">
+                    <span class="op-name">Разработка траншеи экскаватором</span>
+                    <span class="op-resources">🚜 Экскаватор CAT • 👥 2 чел.</span>
+                  </div>
+                  <div class="op-timer-container">
+                    <span class="material-icons-outlined timer-icon">play_circle</span>
+                    <span class="op-timer ticking-timer">00:42:15</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Завершенная операция -->
+              <div class="sim-card operation-card completed">
+                <div class="op-main-row">
+                  <div class="op-details">
+                    <span class="op-name">Монтаж ЖБ колец колодца</span>
+                    <span class="op-resources">👥 Монтажники (3 разряд)</span>
+                  </div>
+                  <div class="op-time-span">
+                    <span class="time-label">08:00 - 09:30</span>
+                    <span class="time-duration">01:30:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="phone-fab">
+              <span class="material-icons-outlined">add</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ИНТЕРАКТИВНЫЙ ДЕМОНСТРАТОР ФУНКЦИЙ (Showcase Section) -->
+  <section class="showcase" id="features">
+    <div class="section-header">
+      <h2>Возможности, которые ускоряют работу в 3 раза</h2>
+      <p>Интерфейс спроектирован для мгновенной фиксации событий на стройплощадке в перчатках или на ходу.</p>
+    </div>
+    
+    <div class="showcase-container">
+      <div class="showcase-tabs">
+        <button class="showcase-tab active" data-feature="timers">
+          <span class="material-icons-outlined tab-icon">timer</span>
+          <div class="tab-text">
+            <h3>Управление секундомерами</h3>
+            <p>Запуск в один тап, разделение операций, параллельный учет задач.</p>
+          </div>
+        </button>
+        
+        <button class="showcase-tab" data-feature="db">
+          <span class="material-icons-outlined tab-icon">storage</span>
+          <div class="tab-text">
+            <h3>Справочники ресурсов</h3>
+            <p>Быстрый выбор рабочих, инструментов, спецтехники и материалов из встроенной БД.</p>
+          </div>
+        </button>
+        
+        <button class="showcase-tab" data-feature="excel">
+          <span class="material-icons-outlined tab-icon">table_chart</span>
+          <div class="tab-text">
+            <h3>Умный экспорт в Excel</h3>
+            <p>Генерация готовых структурированных отчетов по корпоративному стандарту.</p>
+          </div>
+        </button>
+      </div>
+      
+      <!-- Область интерактивного макета -->
+      <div class="showcase-display">
+        <div class="display-container glass">
+          <!-- Заголовок макета (Браузерная строка) -->
+          <div class="mockup-browser-bar">
+            <div class="browser-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+            <div class="browser-url">http://normirovshik.gazprom.local</div>
+          </div>
+          
+          <div class="mockup-content" id="mockupScreen">
+            <!-- Сюда динамически инжектится состояние макета в зависимости от выбранного таба -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ИНТЕРАКТИВНОЕ ЖИВОЕ ДЕМО (Interactive Live Demo) -->
+  <section class="live-demo" id="demo">
+    <div class="demo-card glass">
+      <div class="demo-info">
+        <h2>Попробуйте прямо сейчас</h2>
+        <p>
+          Это упрощенный интерактивный симулятор хронометража. Нажмите **«Старт»**, чтобы запустить таймер, добавьте заметку или выполните «Разделение» операции, как в реальном приложении.
+        </p>
+        <div class="demo-stats">
+          <div class="stat-box">
+            <span class="stat-num" id="demoOpsCount">0</span>
+            <span class="stat-label">Операций</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num" id="demoTotalTime">00:00:00</span>
+            <span class="stat-label">Общее время</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="demo-workspace">
+        <div class="demo-header-panel">
+          <span class="panel-title">Симулятор Хронометража</span>
+          <button class="btn btn-primary btn-sm" id="demoAddBtn">
+            <span class="material-icons-outlined">add</span> Новая операция
+          </button>
+        </div>
+        
+        <div class="demo-list" id="demoListContainer">
+          <!-- Сюда вставляются операции -->
+          <div class="demo-empty-state" id="demoEmptyState">
+            <span class="material-icons-outlined empty-icon">play_circle_outline</span>
+            <p>Список пуст. Нажмите «Новая операция» выше, чтобы протестировать таймер.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- СРАВНЕНИЕ ВЕРСИЙ И СКАЧИВАНИЕ (Platforms Section) -->
+  <section class="platforms" id="platforms">
+    <div class="section-header">
+      <h2>Выберите платформу под ваши задачи</h2>
+      <p>Обе версии полностью синхронны по функционалу и работают 100% автономно на вашем устройстве.</p>
+    </div>
+    
+    <div class="platforms-grid">
+      <!-- Карта Нативного Андроид -->
+      <div class="platform-card glass">
+        <div class="platform-icon-wrap android-color">
+          <span class="material-icons-outlined">android</span>
+        </div>
+        <h3>Android Приложение</h3>
+        <p>
+          Идеальный выбор для корпоративных смартфонов и планшетов. Работает как полноценное нативное приложение. Быстрый экспорт в локальные файлы телефона, поддержка системных уведомлений и фоновых таймеров.
+        </p>
+        <ul class="platform-features">
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Системные уведомления</li>
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Поддержка экспорта в память телефона</li>
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Отдельная иконка на рабочем столе</li>
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Работа в фоновом режиме Android</li>
+        </ul>
+        <button class="btn btn-primary btn-block" id="downloadApkBtn">
+          <span class="material-icons-outlined">download</span> Скачать APK файл
+        </button>
+      </div>
+
+      <!-- Карта PWA для iOS / ПК -->
+      <div class="platform-card glass">
+        <div class="platform-icon-wrap ios-color">
+          <span class="material-icons-outlined">phone_iphone</span>
+        </div>
+        <h3>PWA Версия (iOS / Safari / PC)</h3>
+        <p>
+          Оптимально для пользователей iPhone, iPad или ноутбуков. Не требует установки через App Store. Запустите в один клик через Safari или Chrome, добавьте на экран «Домой» и пользуйтесь офлайн.
+        </p>
+        <ul class="platform-features">
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Запуск без установки файлов</li>
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Полная совместимость с iOS/iPhone</li>
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Открытие на любом ноутбуке/ПК</li>
+          <li><span class="material-icons-outlined check-icon">check_circle</span> Мгновенные автообновления кэша</li>
+        </ul>
+        <a href="../web/index.html" target="_blank" class="btn btn-outline btn-block">
+          <span class="material-icons-outlined">bolt</span> Запустить PWA-версию
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ФУТЕР (Footer) -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-logo">
+        <span class="material-icons-outlined logo-icon">date_range</span>
+        <h3>Нормировщик</h3>
+      </div>
+      <p class="footer-desc">
+        Разработано для инженеров по нормированию труда и учету ресурсов строительных объектов. Проект защищен корпоративной политикой сбора данных.
+      </p>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <span class="copyright">© 2026 Нормировщик. Все права защищены.</span>
+        <span class="version-info">Версия v7.1 • Срок действия лицензии до 01.08.2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Скрипты -->
+  <script src="js/main.js"></script>
+</body>
+</html>
