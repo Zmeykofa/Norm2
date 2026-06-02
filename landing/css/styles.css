@@ -1227,3 +1227,21 @@ a {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--card-border);
 }
+
+/* Accordion summary styling */
+.pwa-instructions-accordion summary::-webkit-details-marker {
+  display: none;
+}
+.pwa-instructions-accordion summary {
+  transition: var(--transition-fast);
+}
+.pwa-instructions-accordion summary:hover {
+  color: var(--primary) !important;
+  opacity: 0.95;
+}
+.pwa-instructions-accordion details[open] summary span:last-child {
+  transform: rotate(180deg);
+}
+.pwa-instructions-accordion details summary span:last-child {
+  transition: transform 0.3s ease;
+}
