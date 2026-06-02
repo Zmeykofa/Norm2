@@ -498,6 +498,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- ПРЕДУПРЕЖДЕНИЕ ПЕРЕД ПЕРЕХОДОМ К PWA ---
+  const pwaLinks = document.querySelectorAll(".pwa-link");
+  pwaLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      const confirmTransition = confirm(
+        "Внимание!\n\nПеред использованием PWA-версии на iPhone обязательно ознакомьтесь с инструкцией по установке и правилами защиты данных от автоматического удаления (находятся внизу страницы).\n\nВы уже прочитали инструкцию и хотите перейти к приложению?"
+      );
+      if (!confirmTransition) {
+        e.preventDefault();
+        const warningCard = document.querySelector(".ios-instructions-card");
+        if (warningCard) {
+          warningCard.scrollIntoView({ behavior: "smooth" });
+          warningCard.style.boxShadow = "0 0 35px rgba(239, 68, 68, 0.45)";
+          setTimeout(() => {
+            warningCard.style.boxShadow = "";
+          }, 2500);
+        }
+      }
+    });
+  });
+
   // --- АНИМАЦИИ ПРИ ПРОКРУТКЕ (Scroll Reveal) ---
   const revealElements = document.querySelectorAll(".showcase-tab, .platform-card, .demo-card, .section-header, .comparison-card");
   
