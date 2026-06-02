@@ -366,36 +366,54 @@
         <a href="https://zmeykofa.github.io/normirovshikIOS/" target="_blank" class="btn btn-outline btn-block">
           <span class="material-icons-outlined">bolt</span> Запустить PWA-версию
         </a>
-        
-        <!-- Кнопка вызова инструкции (iOS и Безопасность данных) -->
-        <div class="pwa-instructions-accordion" style="width: 100%; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;">
-          <details style="cursor: pointer; font-size: 0.85rem; color: var(--text-secondary);">
-            <summary style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--primary-hover); list-style: none; user-select: none;">
-              <span class="material-icons-outlined" style="font-size: 16px;">help_outline</span>
-              Инструкция iOS и защита данных
-              <span class="material-icons-outlined" style="font-size: 14px; margin-left: auto;">expand_more</span>
-            </summary>
-            <div style="margin-top: 10px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; cursor: default; line-height: 1.45;">
-              <div style="background: rgba(255, 255, 255, 0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
-                <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">📲 Установка на iPhone (Safari):</strong>
-                1. Откройте ссылку PWA в браузере <strong>Safari</strong>.<br>
-                2. Нажмите кнопку <strong>«Поделиться»</strong> (квадрат со стрелкой вверх).<br>
-                3. Выберите пункт <strong>«На экран "Домой"»</strong>.<br>
-                4. Нажмите <strong>«Добавить»</strong> в правом верхнем углу.<br>
-                Теперь иконка приложения появится на рабочем столе и будет запускаться на весь экран.
-              </div>
-              <div style="background: rgba(239, 68, 68, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.1);">
-                <strong style="color: #f87171; display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-                  <span class="material-icons-outlined" style="font-size: 14px;">warning</span> 
-                  Защита от потери данных (IndexedDB):
-                </strong>
-                • <strong>Правило 7 дней:</strong> В iOS Safari очищает локальные данные сайтов, если их не открывали 7 дней. Чтобы данные смен не удалились, <strong>запускайте PWA хотя бы раз в неделю</strong>!<br>
-                • <strong>Свободное место:</strong> Следите, чтобы на iPhone было не менее 2–3 ГБ свободного места, иначе iOS может автоматически удалить кэш PWA.<br>
-                • <strong>Резервные копии:</strong> Регулярно делайте экспорт смен в Excel, чтобы сохранить важные отчеты вне устройства.<br>
-                • <strong>Очистка Safari:</strong> Не удаляйте историю и данные сайтов в настройках iPhone — это сотрет базу данных смен.
-              </div>
+      </div>
+    </div>
+
+    <!-- Блок инструкции iOS и защиты данных (высокая видимость) -->
+    <div class="ios-instructions-card glass animate-fade-in" style="margin-top: 40px; padding: 32px; border-radius: var(--radius-lg); border: 1px solid rgba(239, 68, 68, 0.25); background: linear-gradient(135deg, rgba(13, 19, 38, 0.6) 0%, rgba(239, 68, 68, 0.04) 100%); position: relative; overflow: hidden; width: 100%;">
+      <div class="ios-card-glow" style="position: absolute; top: -100px; right: -100px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, rgba(0,0,0,0) 70%); pointer-events: none;"></div>
+      
+      <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="background: rgba(239, 68, 68, 0.12); color: #ef4444; padding: 14px; border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+          <span class="material-icons-outlined" style="font-size: 32px;">warning</span>
+        </div>
+        <div style="flex: 1; min-width: 280px;">
+          <h3 style="font-size: 1.4rem; color: var(--text-primary); margin-bottom: 8px; font-family: 'Outfit', sans-serif;">
+            Важная информация для пользователей iPhone (PWA)
+          </h3>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+            Поскольку PWA работает в браузере iOS Safari, на него распространяются системные ограничения Apple по энергосбережению и очистке памяти. Пожалуйста, следуйте правилам ниже, чтобы защитить ваши смены от автоматического удаления.
+          </p>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <!-- Левая колонка: Установка -->
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 20px; border-radius: var(--radius-md);">
+              <h4 style="font-size: 1.05rem; color: var(--primary-hover); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span class="material-icons-outlined">phone_iphone</span>
+                Как установить на экран «Домой»:
+              </h4>
+              <ol style="margin-left: 20px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: 6px;">
+                <li>Откройте ссылку PWA в браузере <strong>Safari</strong>.</li>
+                <li>Нажмите кнопку <strong>«Поделиться»</strong> (квадрат со стрелкой вверх).</li>
+                <li>Прокрутите список вниз и выберите <strong>«На экран "Домой"»</strong>.</li>
+                <li>Нажмите кнопку <strong>«Добавить»</strong> в правом верхнем углу.</li>
+              </ol>
             </div>
-          </details>
+            
+            <!-- Правая колонка: Защита данных -->
+            <div style="background: rgba(239, 68, 68, 0.02); border: 1px solid rgba(239, 68, 68, 0.1); padding: 20px; border-radius: var(--radius-md);">
+              <h4 style="font-size: 1.05rem; color: #f87171; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span class="material-icons-outlined">security</span>
+                Правила защиты от потери данных:
+              </h4>
+              <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; display: flex; flex-direction: column; gap: 6px; list-style-type: square;">
+                <li><strong style="color: var(--text-primary);">Правило 7 дней:</strong> iOS Safari автоматически удаляет данные сайтов, которые не запускались 7 дней. <strong>Открывайте PWA на рабочем столе хотя бы раз в неделю!</strong></li>
+                <li><strong style="color: var(--text-primary);">Свободная память:</strong> Держите не менее 2–3 ГБ свободного места на iPhone, чтобы iOS не сбросила кэш базы данных.</li>
+                <li><strong style="color: var(--text-primary);">Очистка кэша:</strong> Не очищайте историю/куки Safari в настройках телефона.</li>
+                <li><strong style="color: var(--text-primary);">Резервные копии:</strong> Регулярно делайте «Умный экспорт в Excel» для надежности.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
