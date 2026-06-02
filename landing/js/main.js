@@ -32,21 +32,23 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="material-icons-outlined">timer</span>
           <span>Секундомеры реального времени</span>
         </div>
-        <div class="mockup-card">
-          <div class="mockup-item">
-            <span style="font-weight:600;">Укладка асфальтобетона</span>
-            <span class="demo-timer-span" id="mockupTickingTimer" style="color:var(--success); font-family:monospace; font-weight:700;">00:05:43</span>
+        <div class="mockup-timers-list" style="display:flex; flex-direction:column; gap:10px; overflow-y:auto; height: 260px; padding-right: 4px;">
+          <div class="mockup-card" id="mockupActiveCard" style="border-left: 3px solid var(--success);">
+            <div class="mockup-item">
+              <span style="font-weight:600;" id="mockupActiveTitle">Укладка асфальтобетона</span>
+              <span class="demo-timer-span" id="mockupTickingTimer" style="color:var(--success); font-family:monospace; font-weight:700;">00:05:43</span>
+            </div>
+            <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px;">Ресурсы: Асфальтоукладчик • 👥 4 человека</p>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button class="mockup-btn" id="mockupSplitBtn">Разделить</button>
+              <button class="mockup-btn" style="background:var(--danger);" id="mockupStopBtn">Стоп</button>
+            </div>
           </div>
-          <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px;">Ресурсы: Асфальтоукладчик • 👥 4 человека</p>
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <button class="mockup-btn" id="mockupSplitBtn">Разделить</button>
-            <button class="mockup-btn" style="background:var(--danger);" id="mockupStopBtn">Стоп</button>
-          </div>
-        </div>
-        <div class="mockup-card" style="border-style:solid; border-color:rgba(255,255,255,0.05); background:rgba(0,0,0,0.15);">
-          <div class="mockup-item" style="color:var(--text-secondary);">
-            <span>Выемка грунта в отвал</span>
-            <span style="font-weight:600;">01:45:00</span>
+          <div class="mockup-card" style="border-style:solid; border-color:rgba(255,255,255,0.05); background:rgba(0,0,0,0.15); border-left: 3px solid var(--text-muted);">
+            <div class="mockup-item" style="color:var(--text-secondary);">
+              <span>Выемка грунта в отвал</span>
+              <span style="font-weight:600;">01:45:00</span>
+            </div>
           </div>
         </div>
       </div>
@@ -97,36 +99,102 @@ document.addEventListener("DOMContentLoaded", () => {
   // Логика таймеров внутри макета
   function initMockupTimers() {
     if (mockupInterval) clearInterval(mockupInterval);
-    let seconds = 343; // 5 минут 43 секунды
-    const timerEl = document.getElementById("mockupTickingTimer");
-    const stopBtn = document.getElementById("mockupStopBtn");
-    const splitBtn = document.getElementById("mockupSplitBtn");
+    let activeSeconds = 343; // 5 минут 43 секунды
     
+    const bindMockupEvents = () => {
+      const timerEl = document.getElementById("mockupTickingTimer");
+      const stopBtn = document.getElementById("mockupStopBtn");
+      const splitBtn = document.getElementById("mockupSplitBtn");
+      const timersList = document.querySelector(".mockup-timers-list");
+
+      if (stopBtn) {
+        stopBtn.onclick = () => {
+          clearInterval(mockupInterval);
+          if (timerEl) {
+            timerEl.style.color = "var(--text-secondary)";
+          }
+          const btnContainer = stopBtn.parentElement;
+          if (btnContainer) {
+            btnContainer.innerHTML = '<span style="color:var(--text-secondary); font-size:0.75rem; font-weight:600;">Завершен</span>';
+          }
+        };
+      }
+
+      if (splitBtn) {
+        splitBtn.onclick = () => {
+          clearInterval(mockupInterval);
+          
+          let h = Math.floor(activeSeconds / 3600);
+          let m = Math.floor((activeSeconds % 3600) / 60);
+          let s = activeSeconds % 60;
+          const formattedPrev = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+          const activeCard = document.getElementById("mockupActiveCard");
+          if (activeCard) {
+            activeCard.id = "";
+            activeCard.style.borderLeft = "3px solid var(--text-muted)";
+            activeCard.style.background = "rgba(0,0,0,0.15)";
+            activeCard.style.borderColor = "rgba(255,255,255,0.05)";
+            activeCard.style.borderStyle = "solid";
+            
+            const activeTitle = document.getElementById("mockupActiveTitle")?.textContent || "Укладка асфальтобетона";
+            activeCard.innerHTML = `
+              <div class="mockup-item" style="color:var(--text-secondary);">
+                <span>${activeTitle} (Часть 1)</span>
+                <span style="font-weight:600;">${formattedPrev}</span>
+              </div>
+            `;
+          }
+
+          const newActiveCard = document.createElement("div");
+          newActiveCard.className = "mockup-card animate-fade-in";
+          newActiveCard.id = "mockupActiveCard";
+          newActiveCard.style.borderLeft = "3px solid var(--success)";
+          newActiveCard.innerHTML = `
+            <div class="mockup-item">
+              <span style="font-weight:600;" id="mockupActiveTitle">Укладка асфальтобетона (Часть 2)</span>
+              <span class="demo-timer-span" id="mockupTickingTimer" style="color:var(--success); font-family:monospace; font-weight:700;">00:00:00</span>
+            </div>
+            <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px;">Ресурсы: Асфальтоукладчик • 👥 4 человека</p>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button class="mockup-btn" id="mockupSplitBtn">Разделить</button>
+              <button class="mockup-btn" style="background:var(--danger);" id="mockupStopBtn">Стоп</button>
+            </div>
+          `;
+          
+          if (timersList) {
+            timersList.insertBefore(newActiveCard, timersList.firstChild);
+          }
+
+          activeSeconds = 0;
+          mockupInterval = setInterval(() => {
+            activeSeconds++;
+            let h2 = Math.floor(activeSeconds / 3600);
+            let m2 = Math.floor((activeSeconds % 3600) / 60);
+            let s2 = activeSeconds % 60;
+            const timerEl2 = document.getElementById("mockupTickingTimer");
+            if (timerEl2) {
+              timerEl2.textContent = `${String(h2).padStart(2, "0")}:${String(m2).padStart(2, "0")}:${String(s2).padStart(2, "0")}`;
+            }
+          }, 1000);
+
+          bindMockupEvents();
+        };
+      }
+    };
+
     mockupInterval = setInterval(() => {
-      seconds++;
-      let h = Math.floor(seconds / 3600);
-      let m = Math.floor((seconds % 3600) / 60);
-      let s = seconds % 60;
+      activeSeconds++;
+      let h = Math.floor(activeSeconds / 3600);
+      let m = Math.floor((activeSeconds % 3600) / 60);
+      let s = activeSeconds % 60;
+      const timerEl = document.getElementById("mockupTickingTimer");
       if (timerEl) {
         timerEl.textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
       }
     }, 1000);
 
-    if (stopBtn) {
-      stopBtn.addEventListener("click", () => {
-        clearInterval(mockupInterval);
-        if (timerEl) {
-          timerEl.style.color = "var(--text-secondary)";
-        }
-        alert("Эмуляция остановки таймера. В приложении в этот момент фиксируется конечное время операции.");
-      });
-    }
-
-    if (splitBtn) {
-      splitBtn.addEventListener("click", () => {
-        alert("Операция разделена! В приложении одна операция останавливается текущим временем, и мгновенно запускается следующая с тем же набором ресурсов.");
-      });
-    }
+    bindMockupEvents();
   }
 
   // Логика базы данных внутри макета
@@ -223,10 +291,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let demoOperations = [];
   let demoStatsInterval;
 
+  function formatTimeSpan(totalSecs) {
+    let h = Math.floor(totalSecs / 3600);
+    let m = Math.floor((totalSecs % 3600) / 60);
+    let s = totalSecs % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
   function updateDemoStats() {
     demoOpsCount.textContent = demoOperations.length;
     
-    // Считаем общее время
     let totalSecs = 0;
     demoOperations.forEach(op => {
       if (op.active) {
@@ -236,15 +310,161 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    let h = Math.floor(totalSecs / 3600);
-    let m = Math.floor((totalSecs % 3600) / 60);
-    let s = totalSecs % 60;
-    demoTotalTime.textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    demoTotalTime.textContent = formatTimeSpan(totalSecs);
   }
+
+  const createOperationCard = (randomName, opId, startEpoch, active = true, duration = 0, initialNote = "") => {
+    const newOp = {
+      id: opId,
+      name: randomName,
+      startEpoch: startEpoch,
+      duration: duration,
+      active: active,
+      note: initialNote
+    };
+
+    demoOperations.push(newOp);
+    
+    const div = document.createElement("div");
+    div.className = "demo-op-item";
+    div.dataset.id = opId;
+    
+    if (!active) {
+      div.style.borderLeft = "3px solid var(--text-muted)";
+    } else {
+      div.style.borderLeft = "3px solid var(--success)";
+    }
+
+    div.innerHTML = `
+      <div class="demo-op-details" style="flex:1;">
+        <span class="demo-op-name" style="font-weight: 600; font-size: 0.85rem; display: block;">${randomName}</span>
+        <span class="demo-op-time" style="font-size: 0.75rem; color: var(--text-secondary);">Старт: ${new Date(startEpoch).toLocaleTimeString("ru-RU")}</span>
+        <span class="demo-op-note" style="font-size: 0.75rem; color: #3388ff; margin-top: 4px; display: ${initialNote ? 'block' : 'none'};">
+          ${initialNote ? '📝 Заметка: ' + initialNote : ''}
+        </span>
+      </div>
+      <div class="demo-op-actions" style="display: flex; gap: 8px; align-items: center;">
+        ${active ? `
+          <span class="demo-timer-span ticking-demo-timer">00:00:00</span>
+          <button class="demo-btn-action demo-btn-note" data-id="${opId}" title="Добавить заметку" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-secondary); border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);">
+            <span class="material-icons-outlined" style="font-size:14px;">chat_bubble_outline</span>
+          </button>
+          <button class="demo-btn-action demo-btn-split" data-id="${opId}" title="Разделить операцию" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-secondary); border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition-fast);">
+            <span class="material-icons-outlined" style="font-size:14px;">call_split</span>
+          </button>
+          <button class="demo-btn-stop" data-id="${opId}">
+            <span class="material-icons-outlined" style="font-size:14px;">stop</span> Стоп
+          </button>
+        ` : `
+          <span class="demo-timer-span" style="color:var(--text-secondary);">${formatTimeSpan(duration)}</span>
+          <span class="material-icons-outlined" style="color:var(--text-muted); font-size:18px;">check_circle</span>
+        `}
+      </div>
+    `;
+
+    // Эмуляция наведения мыши для кнопок
+    const actionBtns = div.querySelectorAll(".demo-btn-action");
+    actionBtns.forEach(btn => {
+      btn.onmouseover = () => {
+        btn.style.background = "var(--primary-glow)";
+        btn.style.borderColor = "var(--primary)";
+        btn.style.color = "var(--text-primary)";
+      };
+      btn.onmouseout = () => {
+        btn.style.background = "rgba(255, 255, 255, 0.05)";
+        btn.style.borderColor = "rgba(255, 255, 255, 0.08)";
+        btn.style.color = "var(--text-secondary)";
+      };
+    });
+
+    // Обработка кнопки добавления заметки
+    const noteBtn = div.querySelector(".demo-btn-note");
+    if (noteBtn) {
+      noteBtn.addEventListener("click", () => {
+        const noteText = prompt("Введите текст заметки для операции:");
+        if (noteText && noteText.trim() !== "") {
+          const op = demoOperations.find(o => o.id === opId);
+          if (op) {
+            op.note = noteText.trim();
+            const noteSpan = div.querySelector(".demo-op-note");
+            if (noteSpan) {
+              noteSpan.textContent = `📝 Заметка: ${op.note}`;
+              noteSpan.style.display = "block";
+            }
+          }
+        }
+      });
+    }
+
+    // Обработка кнопки разделения
+    const splitBtn = div.querySelector(".demo-btn-split");
+    if (splitBtn) {
+      splitBtn.addEventListener("click", () => {
+        const op = demoOperations.find(o => o.id === opId);
+        if (op && op.active) {
+          // Останавливаем текущую операцию
+          op.active = false;
+          op.duration = Math.floor((Date.now() - op.startEpoch) / 1000);
+
+          // Обновляем текущую карточку
+          div.style.borderLeft = "3px solid var(--text-muted)";
+          const actions = div.querySelector(".demo-op-actions");
+          if (actions) {
+            actions.innerHTML = `
+              <span class="demo-timer-span" style="color:var(--text-secondary);">${formatTimeSpan(op.duration)}</span>
+              <span class="material-icons-outlined" style="color:var(--text-muted); font-size:18px;">check_circle</span>
+            `;
+          }
+
+          // Определяем новое имя (Часть N)
+          let splitName;
+          const match = op.name.match(/\(Часть (\d+)\)/);
+          if (match) {
+            const nextPart = parseInt(match[1]) + 1;
+            splitName = op.name.replace(/\(Часть \d+\)/, `(Часть ${nextPart})`);
+          } else {
+            splitName = `${op.name} (Часть 2)`;
+            const nameSpan = div.querySelector(".demo-op-name");
+            if (nameSpan) {
+              nameSpan.textContent = `${op.name} (Часть 1)`;
+            }
+            op.name = `${op.name} (Часть 1)`;
+          }
+
+          // Создаем новую операцию
+          createOperationCard(splitName, Date.now(), Date.now(), true, 0, op.note);
+        }
+      });
+    }
+
+    // Обработка кнопки «Стоп»
+    const stopBtn = div.querySelector(".demo-btn-stop");
+    if (stopBtn) {
+      stopBtn.addEventListener("click", () => {
+        const op = demoOperations.find(o => o.id === opId);
+        if (op && op.active) {
+          op.active = false;
+          op.duration = Math.floor((Date.now() - op.startEpoch) / 1000);
+
+          div.style.borderLeft = "3px solid var(--text-muted)";
+          const actions = div.querySelector(".demo-op-actions");
+          if (actions) {
+            actions.innerHTML = `
+              <span class="demo-timer-span" style="color:var(--text-secondary);">${formatTimeSpan(op.duration)}</span>
+              <span class="material-icons-outlined" style="color:var(--text-muted); font-size:18px;">check_circle</span>
+            `;
+          }
+          updateDemoStats();
+        }
+      });
+    }
+
+    demoListContainer.insertBefore(div, demoListContainer.firstChild);
+    updateDemoStats();
+  };
 
   if (demoAddBtn) {
     demoAddBtn.addEventListener("click", () => {
-      // Скрываем пустой холст
       if (demoEmptyState) demoEmptyState.style.display = "none";
       
       const names = [
@@ -258,68 +478,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const randomName = names[Math.floor(Math.random() * names.length)];
       const opId = Date.now();
       
-      const newOp = {
-        id: opId,
-        name: randomName,
-        startEpoch: Date.now(),
-        duration: 0,
-        active: true
-      };
+      createOperationCard(randomName, opId, Date.now(), true, 0, "");
 
-      demoOperations.push(newOp);
-      
-      // Рендерим элемент
-      const div = document.createElement("div");
-      div.className = "demo-op-item";
-      div.dataset.id = opId;
-      div.innerHTML = `
-        <div class="demo-op-details">
-          <span class="demo-op-name">${randomName}</span>
-          <span class="demo-op-time">Старт: ${new Date().toLocaleTimeString("ru-RU")}</span>
-        </div>
-        <div class="demo-op-actions">
-          <span class="demo-timer-span ticking-demo-timer">00:00:00</span>
-          <button class="demo-btn-stop" data-id="${opId}">
-            <span class="material-icons-outlined" style="font-size:14px;">stop</span> Стоп
-          </button>
-        </div>
-      `;
-
-      // Привязка стоп-кнопки
-      div.querySelector(".demo-btn-stop").addEventListener("click", (e) => {
-        const id = Number(e.currentTarget.dataset.id);
-        const op = demoOperations.find(o => o.id === id);
-        if (op && op.active) {
-          op.active = false;
-          op.duration = Math.floor((Date.now() - op.startEpoch) / 1000);
-          
-          // Обновляем визуально
-          const card = demoListContainer.querySelector(`.demo-op-item[data-id="${id}"]`);
-          if (card) {
-            card.style.borderLeft = "3px solid var(--text-muted)";
-            const actions = card.querySelector(".demo-op-actions");
-            
-            let h = Math.floor(op.duration / 3600);
-            let m = Math.floor((op.duration % 3600) / 60);
-            let s = op.duration % 60;
-            const formatted = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-            
-            actions.innerHTML = `
-              <span class="demo-timer-span" style="color:var(--text-secondary);">${formatted}</span>
-              <span class="material-icons-outlined" style="color:var(--text-muted); font-size:18px;">check_circle</span>
-            `;
-          }
-          updateDemoStats();
-        }
-      });
-
-      demoListContainer.insertBefore(div, demoListContainer.firstChild);
-      updateDemoStats();
-      
-      // Запускаем общий таймер обновлений если не запущен
       if (!demoStatsInterval) {
         demoStatsInterval = setInterval(() => {
-          // Обновляем бегущие циферблаты
           const activeTimers = demoListContainer.querySelectorAll(".ticking-demo-timer");
           activeTimers.forEach(timerEl => {
             const card = timerEl.closest(".demo-op-item");
@@ -327,13 +489,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const op = demoOperations.find(o => o.id === id);
             if (op && op.active) {
               const diffSec = Math.floor((Date.now() - op.startEpoch) / 1000);
-              let h = Math.floor(diffSec / 3600);
-              let m = Math.floor((diffSec % 3600) / 60);
-              let s = diffSec % 60;
-              timerEl.textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+              timerEl.textContent = formatTimeSpan(diffSec);
             }
           });
-          
           updateDemoStats();
         }, 1000);
       }
