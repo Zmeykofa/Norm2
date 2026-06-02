@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- ИНТЕРАКТИВНЫЕ МАКЕТЫ (Features Showcase) ---
   const showcaseTabs = document.querySelectorAll(".showcase-tab");
   const mockupScreen = document.getElementById("mockupScreen");
+  let mockupInterval;
 
   const mockupTemplates = {
     timers: `
@@ -60,8 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="mockup-card mockup-flex-1" style="border-style:solid; padding:10px;">
             <span style="font-size:0.75rem; font-weight:700; color:var(--text-secondary);">👷 СОТРУДНИКИ</span>
             <div id="mockupWorkersList" style="display:flex; flex-direction:column; gap:4px; margin-top:6px;">
-              <div class="mockup-item" style="padding:4px 8px;"><span>Иванов И.И. (Монтажник, 5 разряд)</span></div>
-              <div class="mockup-item" style="padding:4px 8px;"><span>Петров П.П. (Машинист, 6 разряд)</span></div>
+               <div class="mockup-item" style="padding:4px 8px;"><span>Иванов И.И. (Монтажник, 5 разряд)</span></div>
+               <div class="mockup-item" style="padding:4px 8px;"><span>Петров П.П. (Машинист, 6 разряд)</span></div>
             </div>
             <button class="mockup-btn" id="mockupAddWorkerBtn" style="margin-top:6px; font-size:0.65rem; padding:4px 8px;">+ Добавить в базу</button>
           </div>
@@ -93,33 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `
   };
 
-  // Инициализация первого таба
-  function setFeature(featureName) {
-    mockupScreen.innerHTML = mockupTemplates[featureName];
-    
-    // Привязка скриптов для интерактивности внутри макета
-    if (featureName === "timers") {
-      initMockupTimers();
-    } else if (featureName === "db") {
-      initMockupDb();
-    } else if (featureName === "excel") {
-      initMockupExcel();
-    }
-  }
-
-  setFeature("timers");
-
-  showcaseTabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      showcaseTabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      const feat = tab.dataset.feature;
-      setFeature(feat);
-    });
-  });
-
   // Логика таймеров внутри макета
-  let mockupInterval;
   function initMockupTimers() {
     if (mockupInterval) clearInterval(mockupInterval);
     let seconds = 343; // 5 минут 43 секунды
@@ -199,6 +174,31 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   }
+
+  function setFeature(featureName) {
+    mockupScreen.innerHTML = mockupTemplates[featureName];
+    
+    // Привязка скриптов для интерактивности внутри макета
+    if (featureName === "timers") {
+      initMockupTimers();
+    } else if (featureName === "db") {
+      initMockupDb();
+    } else if (featureName === "excel") {
+      initMockupExcel();
+    }
+  }
+
+  // Инициализация первого таба
+  setFeature("timers");
+
+  showcaseTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      showcaseTabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const feat = tab.dataset.feature;
+      setFeature(feat);
+    });
+  });
 
   // --- ГЛАВНЫЙ ГЕРОЙ-ТАЙМЕР (Hero Ticking Timer) ---
   const heroTimer = document.querySelector(".ticking-timer");

@@ -945,9 +945,10 @@ a {
 
 .comp-images {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
   align-items: flex-start;
+  justify-items: center;
 }
 
 .comp-img-box {
@@ -956,16 +957,23 @@ a {
   overflow: hidden;
   background: #0f1322;
   border: 1px solid rgba(255, 255, 255, 0.04);
-  aspect-ratio: 1.6;
+  aspect-ratio: 9 / 16;
   box-shadow: var(--shadow-sm);
 }
 
 .comp-img-box.phone-aspect {
-  aspect-ratio: 0.6; /* 9:15 aspect ratio to fit the vertical mobile screenshots perfectly! */
+  aspect-ratio: 9 / 16; /* Exact 9:16 vertical aspect ratio to fit the vertical mobile screenshots perfectly! */
   max-height: 480px; /* Cap mobile height so it fits next to the web screenshot beautifully */
   justify-self: center;
   width: 100%;
-  max-width: 288px;
+  max-width: 270px;
+}
+
+@media (max-width: 600px) {
+  .comp-images {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 .comp-img {
