@@ -198,51 +198,85 @@
   <!-- ГАЛЕРЕЯ РЕАЛЬНЫХ СКРИНШОТОВ (Screenshots Gallery) -->
   <section class="gallery" id="gallery">
     <div class="section-header">
-      <h2>Реальные экраны веб-версии приложения</h2>
-      <p>Посмотрите, как выглядит интерфейс с реальными данными на объекте.</p>
+      <h2>Сравнение интерфейсов: Web vs Android</h2>
+      <p>Обе платформы используют единый дизайн-код и структуры данных, адаптированные под форм-фактор устройства.</p>
     </div>
     
     <div class="gallery-container">
-      <div class="gallery-grid">
-        <div class="gallery-item glass">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshot_main.png" alt="Главный экран приложения" class="gallery-img">
-          </div>
-          <div class="gallery-info">
-            <h4>Панель хронометража</h4>
-            <p>Паспорт дня, текущие секундомеры и список завершенных операций с таймингом.</p>
-          </div>
-        </div>
+      <div class="comparison-grid">
         
-        <div class="gallery-item glass">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshot_db_staff.png" alt="Справочник исполнителей" class="gallery-img">
+        <!-- Карточка 1: Главный экран -->
+        <div class="comparison-card glass">
+          <div class="comp-header">
+            <h3>⏱️ Панель хронометража и таймеры</h3>
+            <p>Учет паспорта дня, тикающие секундомеры, запуск и остановка операций.</p>
           </div>
-          <div class="gallery-info">
-            <h4>База исполнителей</h4>
-            <p>Ведение реестра сотрудников с указанием должностей и разрядов для отчетов.</p>
-          </div>
-        </div>
-        
-        <div class="gallery-item glass">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshot_db_equipment.png" alt="Справочник спецтехники" class="gallery-img">
-          </div>
-          <div class="gallery-info">
-            <h4>Справочник спецтехники</h4>
-            <p>Учет задействованных машин, бульдозеров, кранов и назначенных машинистов.</p>
+          <div class="comp-images">
+            <div class="comp-img-box">
+              <span class="comp-badge web-badge">PWA / Web</span>
+              <img src="assets/screenshot_main.png" alt="Панель хронометража Web" class="comp-img">
+            </div>
+            <div class="comp-img-box phone-aspect">
+              <span class="comp-badge android-badge">Android App</span>
+              <img src="assets/android_screenshot_main.png" alt="Панель хронометража Android" class="comp-img">
+            </div>
           </div>
         </div>
-        
-        <div class="gallery-item glass">
-          <div class="gallery-img-wrap">
-            <img src="assets/screenshot_edit_op.png" alt="Редактирование операции" class="gallery-img">
+
+        <!-- Карточка 2: Боковое меню / Календарь -->
+        <div class="comparison-card glass">
+          <div class="comp-header">
+            <h3>📅 Список дней и навигация</h3>
+            <p>Выбор смен, переименование, удаление дней, быстрый переход к справочникам БД.</p>
           </div>
-          <div class="gallery-info">
-            <h4>Настройка операции</h4>
-            <p>Удобное прикрепление исполнителей, материалов и инструментов из локальной БД.</p>
+          <div class="comp-images">
+            <div class="comp-img-box">
+              <span class="comp-badge web-badge">PWA / Web (Панель)</span>
+              <img src="assets/screenshot_main.png" alt="Боковое меню Web" class="comp-img" style="object-position: left center;">
+            </div>
+            <div class="comp-img-box phone-aspect">
+              <span class="comp-badge android-badge">Android App (Шторка)</span>
+              <img src="assets/android_screenshot_menu.png" alt="Боковое меню Android" class="comp-img">
+            </div>
           </div>
         </div>
+
+        <!-- Карточка 3: База данных и Справочники -->
+        <div class="comparison-card glass">
+          <div class="comp-header">
+            <h3>🗂️ Справочники исполнителей, техники, материалов</h3>
+            <p>Ведение базы рабочих (должность, разряд), спецоборудования и материалов.</p>
+          </div>
+          <div class="comp-images">
+            <div class="comp-img-box">
+              <span class="comp-badge web-badge">PWA / Web (Сетка)</span>
+              <img src="assets/screenshot_db_staff.png" alt="Справочники Web" class="comp-img">
+            </div>
+            <div class="comp-img-box phone-aspect">
+              <span class="comp-badge android-badge">Android App (Диалог)</span>
+              <img src="assets/android_screenshot_directory.png" alt="Справочники Android" class="comp-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 4: Редактирование операции -->
+        <div class="comparison-card glass">
+          <div class="comp-header">
+            <h3>📋 Настройка и привязка ресурсов к операции</h3>
+            <p>Указание количества рабочих, выбор инструментов, материалов и машинистов из БД.</p>
+          </div>
+          <div class="comp-images">
+            <div class="comp-img-box">
+              <span class="comp-badge web-badge">PWA / Web (Форма)</span>
+              <img src="assets/screenshot_edit_op.png" alt="Настройка операции Web" class="comp-img">
+            </div>
+            <div class="comp-img-box phone-aspect">
+              <span class="comp-badge android-badge">Android App (Диалог)</span>
+              <img src="assets/android_screenshot_edit_op.png" alt="Настройка операции Android" class="comp-img">
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>

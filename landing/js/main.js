@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- АНИМАЦИИ ПРИ ПРОКРУТКЕ (Scroll Reveal) ---
-  const revealElements = document.querySelectorAll(".showcase-tab, .platform-card, .demo-card, .section-header, .gallery-item");
+  const revealElements = document.querySelectorAll(".showcase-tab, .platform-card, .demo-card, .section-header, .comparison-card");
   
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
