@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.normirovshikapp"
     compileSdk = 34
-    
+
     defaultConfig {
         applicationId = "com.example.normirovshikapp"
         minSdk = 26

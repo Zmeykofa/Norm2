@@ -57,7 +57,7 @@ import androidx.compose.material.icons.outlined.SaveAlt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-    // Офлайн проверка даты для блокировки (01.08.2026)
+    // Офлайн проверка даты для блокировки (31.08.2026)
     val isBlocked = remember {
         val calendar = Calendar.getInstance()
         val currentYear = calendar.get(Calendar.YEAR)
@@ -66,7 +66,7 @@ fun MainScreen(viewModel: MainViewModel) {
         
         currentYear > 2026 || 
         (currentYear == 2026 && currentMonth > Calendar.AUGUST) || 
-        (currentYear == 2026 && currentMonth == Calendar.AUGUST && currentDay >= 1)
+        (currentYear == 2026 && currentMonth == Calendar.AUGUST && currentDay >= 31)
     }
 
     if (isBlocked) {
@@ -93,14 +93,14 @@ fun MainScreen(viewModel: MainViewModel) {
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Эта версия приложения была заблокирована 01.08.2026. Пожалуйста, обратитесь к администратору или обновите приложение до актуальной версии.",
+                    text = "Эта версия приложения была заблокирована 31.08.2026. Пожалуйста, обратитесь к администратору или обновите приложение до актуальной версии.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "Код ошибки: EXP-20260801",
+                    text = "Код ошибки: EXP-20260831",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f)
                 )

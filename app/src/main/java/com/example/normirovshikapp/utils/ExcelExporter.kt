@@ -79,6 +79,7 @@ class ExcelExporter {
             equipmentList.joinToString(", ") { it.displayName() }
         }
         addRow("Техника (список шаблонов)", formatEquipmentForExcel(equipmentStr))
+        addRow("Машинисты (список шаблонов)", formatMachinistsForExcel(equipmentStr))
 
         val materialsStr = if (day.materialsList.isNotBlank()) {
             day.materialsList
